@@ -1,3 +1,5 @@
+using System.Runtime.InteropServices;
+using System;
 using RestSharp;
 
 namespace BusboardCSharp {
@@ -22,6 +24,11 @@ namespace BusboardCSharp {
 
             if (response == null) {
                 throw new Exception("Tfl API error");
+
+            } else if(response.StopPoints.Length==0){
+                Console.WriteLine("No bus stops found within 1 km of your postcode.");
+                Environment.Exit(0);
+    
             } else if (response.StopPoints.Length>2){
                 var SortbyDistanceResponse = response.StopPoints.OrderBy(s=>s.Distance).ToArray();
                  Array.Copy(SortbyDistanceResponse, 0, modifiedresponse, 0,2);
@@ -36,22 +43,32 @@ namespace BusboardCSharp {
         public static async Task<List<BusboardCSharp.Nearest_StopPoints>> getArrivalsfromPostCode(){
             List<Nearest_StopPoints> myResponse = new List<Nearest_StopPoints>();
            
-
             var Stops = await TflClient.getNearestStops();
-
             foreach (var Stop in Stops) {
                 var request = new RestRequest($"{Stop.ID}/Arrivals");
                 var response = await StopPointClient.GetAsync<BusboardCSharp.StopPointArrival[]>(request);
-                 Nearest_StopPoints myObject = new Nearest_StopPoints(){
-                    Modes = Stop.Modes,
-                    Name = Stop.Name,
-                    Distance = Stop.Distance,
-                    Arrivals = response,
-                 };
-                    myResponse.Add(myObject);
+
+                if(response !=null && Stop.Modes !=null && Stop.Name !=null){
+                    Nearest_StopPoints myObject = new Nearest_StopPoints(){
+                        Modes = Stop.Modes,
+                        Name = Stop.Name,
+                        Distance = Stop.Distance,
+                        Arrivals = response,
+                    };
+                    if(myObject.Arrivals.Length==0){
+                        myObject.Message = "No buses arriving at this stop";
+                    }
                     
+                    myResponse.Add(myObject); 
+                }
+
+                if(myResponse[0].Arrivals.Length ==0 && myResponse[1].Arrivals.Length ==0){
+
+                }
+                        
             }
-        
+            
+
             return myResponse;
         }
     }

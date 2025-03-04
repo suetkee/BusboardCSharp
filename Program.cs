@@ -19,6 +19,7 @@ namespace BusboardCSharp {
                     Console.WriteLine($"Heading towards: {arrivaltime.towards}");
                     Console.WriteLine();
                 }
+                Console.WriteLine(Arrival.Message);
                 Console.WriteLine();
            }
         }
