@@ -5,7 +5,7 @@ namespace BusboardCSharp {
     public class StopPointData {
 
         [JsonPropertyName("stopPoints")]
-        public StopPoint[]? StopPoints { get; set; }
+        public required StopPoint[] StopPoints { get; set; }
     }
 
     public class StopPoint {
@@ -19,7 +19,7 @@ namespace BusboardCSharp {
         public string? Name { get; set; }
 
         [JsonPropertyName("distance")]
-        public double Distance { get; set; }
+        public decimal Distance { get; set; }
 
     }
 }
